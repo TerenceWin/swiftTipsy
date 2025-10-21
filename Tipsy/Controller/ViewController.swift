@@ -12,12 +12,12 @@ class ViewController: UIViewController {
     @IBOutlet weak var zeroPercentTip: UIButton!
     @IBOutlet weak var tenPercentTip: UIButton!
     @IBOutlet weak var twentyPercentTip: UIButton!
-    @IBOutlet weak var label: UILabel?
+    @IBOutlet weak var label: UILabel!
     @IBOutlet weak var stepper: UIStepper!
     @IBOutlet weak var calculateButton: UIButton!
     
     var people : Int = 0
-    var tipPercentage: Double? = nil
+    var tipPercentage: Double? = 1.00
     var totalBill: Double? = nil
     var input: String? = nil
     var totalBillForEachPerson: Double?
@@ -50,17 +50,32 @@ class ViewController: UIViewController {
     }
     
     @IBAction func tipSelected(_ sender: UIButton){
-        switch sender.currentTitle {
-            case "0%":
-                tipPercentage = 0.0
-            case "10%":
-                tipPercentage = 0.1
-            case "20%":
-                tipPercentage = 0.2
-            default:
-                break
-            }
-        print(tipPercentage!)
+        if let tip = sender.currentTitle{
+            switch tip{
+                case "0%":
+                    tipPercentage = 1.00
+                    print("At 0%")
+                case "10%":
+                    tipPercentage = 1.10
+                    print("At 10%")
+                case "20%":
+                    tipPercentage = 1.20
+                    print("At 20%")
+                default:
+                    tipPercentage = 1.00
+                    print("At default")
+                }
+            print(tipPercentage!)
+        }
+        print("At tipSelected Function")
+    }
+    
+    @IBAction func peopleChange(_ sender: UIStepper){
+        label.text = String(Int(sender.value))
+    }
+    
+    @IBAction func calculatePage(_ sender: UIButton){
+        self.performSegue(withIdentifier: "goToResultVC", sender: nil)
     }
     
 
