@@ -8,75 +8,100 @@
 import UIKit
 
 class ViewController: UIViewController {
-    @IBOutlet weak var userInput: UITextField!
+
+    var tips = Tips()
+    var selectedZero: Bool = false
+    var selectedTen: Bool = false
+    var selectedTwenty: Bool = false
+
+    
+    @IBOutlet weak var userTextField: UITextField!
     @IBOutlet weak var zeroPercentTip: UIButton!
     @IBOutlet weak var tenPercentTip: UIButton!
     @IBOutlet weak var twentyPercentTip: UIButton!
-    @IBOutlet weak var label: UILabel!
-    @IBOutlet weak var stepper: UIStepper!
-    @IBOutlet weak var calculateButton: UIButton!
-    
-    var people : Int = 0
-    var tipPercentage: Double? = 1.00
-    var totalBill: Double? = nil
-    var input: String? = nil
-    var totalBillForEachPerson: Double?
+    @IBOutlet weak var peopleLabel: UILabel!
+    @IBOutlet weak var peopleStepper: UIStepper!
+    @IBOutlet weak var CalculateButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        userInput.addTarget(self, action: #selector(textFieldChange(_:)), for: .editingChanged)
-
-        let tap = UIGestureRecognizer(target: self, action: #selector(dismissTextField))
-        view.addGestureRecognizer(tap)
-        
-        people = Int(stepper.value)
-        label!.text = String(people)
-        
-        
+        userTextField.addTarget(self, action: #selector(userInputtingBill(_:)), for: .editingChanged)
+        peopleLabel.text = (String(Int(peopleStepper.value)))
+        peopleStepper.addTarget(self, action: #selector(peopleChange(_:)), for: .valueChanged)
     }
     
-    @objc func dismissTextField(){
-        view.endEditing(true)
-    }
-    
-    @IBAction func textFieldChange(_ sender: UITextField){
-        if let input = sender.text{
-            let doubleInput = Double(input)
-            totalBill = doubleInput
+    @IBAction func userInputtingBill(_ sender: UITextField){
+        if let text = sender.text, let value = Double(text){
+            tips.totalBill = value
         }else{
-            totalBill = 0.0
+            tips.totalBill = 0.00
         }
+        print(tips.totalBill)
     }
+    
     
     @IBAction func tipSelected(_ sender: UIButton){
-        if let tip = sender.currentTitle{
-            switch tip{
-                case "0%":
-                    tipPercentage = 1.00
-                    print("At 0%")
-                case "10%":
-                    tipPercentage = 1.10
-                    print("At 10%")
-                case "20%":
-                    tipPercentage = 1.20
-                    print("At 20%")
-                default:
-                    tipPercentage = 1.00
-                    print("At default")
-                }
-            print(tipPercentage!)
+        switch sender{
+        case zeroPercentTip:
+            selectedZero = true
+            selectedTen = false
+            selectedTwenty = false
+            tips.tipPercentage = 1.00
+        case tenPercentTip:
+            selectedZero = false
+            selectedTen = true
+            selectedTwenty = false
+            tips.tipPercentage = 1.10
+        case twentyPercentTip:
+            selectedZero = false
+            selectedTen = false
+            selectedTwenty = true
+            tips.tipPercentage = 1.20
+        default:
+            print("No such button")
         }
-        print("At tipSelected Function")
+        displayTipsButtonBackground()
+        print(tips.tipPercentage)
+    }
+    
+    func displayTipsButtonBackground(){
+        if selectedZero{
+            zeroPercentTip.backgroundColor = UIColor.green
+            tenPercentTip.backgroundColor = UIColor.clear
+            twentyPercentTip.backgroundColor = UIColor.clear
+        }else if selectedTen{
+            zeroPercentTip.backgroundColor = UIColor.clear
+            tenPercentTip.backgroundColor = UIColor.green
+            twentyPercentTip.backgroundColor = UIColor.clear
+        }else if selectedTwenty{
+            zeroPercentTip.backgroundColor = UIColor.clear
+            tenPercentTip.backgroundColor = UIColor.clear
+            twentyPercentTip.backgroundColor = UIColor.green
+        }
     }
     
     @IBAction func peopleChange(_ sender: UIStepper){
-        label.text = String(Int(sender.value))
+        let value = Int(sender.value)
+        peopleLabel.text = String(value)
+        tips.totalPeople = value
     }
     
-    @IBAction func calculatePage(_ sender: UIButton){
-        self.performSegue(withIdentifier: "goToResultVC", sender: nil)
+    @IBAction func calculateButtonTapped(_ sender: UIButton){
+        
+        tips.eachPersonBill = String(format: "%.2f", tips.totalBill * tips.tipPercentage / Double(tips.totalPeople))
+        
+        print(tips.eachPersonBill)
+        self.performSegue(withIdentifier: "goToResultVC", sender: self)
     }
+    
+    @objc override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! ResultsViewController
+        destinationVC.personBill = tips.eachPersonBill
+        destinationVC.finalMessage = tips.message
+    }
+    
+    
+    
     
 
 }

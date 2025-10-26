@@ -9,13 +9,22 @@ import UIKit
 
 class ResultsViewController: UIViewController{
     
+    var personBill: String?
+    var finalMessage: String?
+    
     @IBOutlet weak var recalculateButton: UIButton!
+    @IBOutlet weak var messageLabel: UILabel!
+    @IBOutlet weak var billLabel: UILabel!
+    
     override func viewDidLoad(){
-        
+        billLabel.text = personBill!
+        messageLabel.text = finalMessage!
     }
     
     @IBAction func recalculate(_ sender: UIButton){
-        self.performSegue(withIdentifier: "goToViewController", sender: nil)
+        self.dismiss(animated: true)
     }
+    
+    
     
 }
